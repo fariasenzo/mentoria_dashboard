@@ -47,11 +47,15 @@ if "pagina" not in st.session_state:
     st.session_state.pagina = "vendas"
 
 with st.sidebar:
-    st.markdown("## Mentoria")
-    st.markdown("---")
-    if st.button("📈 Vendas", use_container_width=True):
+    st.markdown("""
+        <div style="padding:1.25rem 1.25rem 0.75rem">
+            <div style="color:#ff5400;font-size:1.2rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase">Mentoria</div>
+            <div style="height:2px;background:linear-gradient(90deg,#ff5400,transparent);margin-top:6px"></div>
+        </div>
+    """, unsafe_allow_html=True)
+    if st.button("Vendas", use_container_width=True):
         st.session_state.pagina = "vendas"
-    if st.button("📣 Marketing", use_container_width=True):
+    if st.button("Marketing", use_container_width=True):
         st.session_state.pagina = "marketing"
 
 conn         = get_conn()

@@ -165,7 +165,12 @@ def bar_chart(fig_data, title, orientation='v', fig_data2=None):
     return fig
 
 def show_vendas(conn):
-    st.title("Vendas")
+    st.markdown("""
+        <div style="margin-bottom:1.5rem">
+            <span style="font-size:2rem;font-weight:800;color:#ffffff;letter-spacing:-0.02em">Vendas</span>
+            <span style="display:inline-block;width:8px;height:8px;background:#ff5400;border-radius:50%;margin-left:8px;vertical-align:middle"></span>
+        </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("##### Período")
     col_p, col_btn = st.columns([5, 1])
@@ -230,6 +235,30 @@ def show_vendas(conn):
         weekly2.columns = ['semana', 'receita']
 
     st.plotly_chart(bar_chart(weekly, "Receita por Semana", fig_data2=weekly2), use_container_width=True)
+
+    st.markdown("---")
+
+    daily = df1_p.groupby('day')['valor_liquido'].sum().reindex(range(1, 32), fill_value=0).reset_index()
+    daily.columns = ['dia', 'receita']
+    fig_line = go.Figure(go.Scatter(
+        x=daily['dia'],
+        y=daily['receita'],
+        mode='lines',
+        line=dict(color='#FFE600', width=2.5),
+        fill='tozeroy',
+        fillcolor='rgba(255,230,0,0.04)',
+        hovertemplate='Dia %{x}: %{y:,.2f}<extra></extra>',
+    ))
+    fig_line.update_layout(
+        title=dict(text="Receita por Dia do Mês", font=dict(color='#f1f5f9', size=16)),
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=10, r=20, t=50, b=20),
+        height=280,
+        xaxis=dict(showgrid=False, zeroline=False, tickfont=dict(color='#e5e7eb', size=11), dtick=1),
+        yaxis=dict(showgrid=False, zeroline=False, tickfont=dict(color='#e5e7eb', size=11)),
+    )
+    st.plotly_chart(fig_line, use_container_width=True)
 
     st.markdown("---")
 
