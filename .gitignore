@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+venv/
+.venv/
+streamlit_app_backup.py
+views/vendas_backup.py
+views/marketing_backup.py
+schema

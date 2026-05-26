@@ -1,0 +1,88 @@
+#MainMenu { visibility: hidden; }
+footer { visibility: hidden; }
+[data-testid="stToolbarActions"],
+[data-testid="stAppDeployButton"],
+[data-testid="stMainMenu"] { visibility: hidden; }
+
+button[data-testid="stExpandSidebarButton"] {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+body { font-family: 'Inter', system-ui, sans-serif; }
+
+/* Sidebar */
+[data-testid="stSidebar"] {
+    border-right: 1px solid #1f1f1f !important;
+}
+[data-testid="stSidebar"] .stButton > button {
+    background-color: transparent !important;
+    color: #d1d5db !important;
+    border: none !important;
+    text-align: left !important;
+    width: 100% !important;
+    padding: 0.75rem 1.25rem !important;
+    border-radius: 8px !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+}
+[data-testid="stSidebar"] .stButton > button:hover {
+    border-left: 3px solid #ff5400 !important;
+    color: #ffffff !important;
+}
+
+/* KPI Cards */
+[data-testid="metric-container"] {
+    background-color: #0f0f0f;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    border: 1px solid #1a1a1a;
+}
+[data-testid="stMetricLabel"] { color: #6b7280 !important; font-size: 0.82rem !important; text-transform: uppercase; letter-spacing: 0.05em; }
+[data-testid="stMetricValue"] { color: #ffffff !important; font-size: 2rem !important; font-weight: 700 !important; }
+[data-testid="stMetricDelta"] { font-size: 0.85rem !important; }
+
+/* Borda colorida por posição */
+div[data-testid="column"]:nth-child(1) [data-testid="metric-container"] { border-left: 4px solid #ff5400; }
+div[data-testid="column"]:nth-child(2) [data-testid="metric-container"] { border-left: 4px solid #38bdf8; }
+div[data-testid="column"]:nth-child(3) [data-testid="metric-container"] { border-left: 4px solid #10b981; }
+
+/* Radio buttons */
+[data-testid="stRadio"] label { color: #9ca3af !important; font-size: 0.9rem !important; }
+[data-testid="stRadio"] > div { gap: 0.25rem !important; }
+
+/* Inputs */
+[data-testid="stDateInput"] input {
+    background-color: #0f0f0f !important;
+    border-color: #1f1f1f !important;
+    color: #e5e7eb !important;
+    border-radius: 8px !important;
+}
+[data-testid="stDateInput"] label { color: #6b7280 !important; font-size: 0.82rem !important; }
+
+/* Toggle */
+[data-testid="stToggle"] label { color: #9ca3af !important; }
+
+/* Botões principais */
+.main .stButton > button {
+    background-color: #ff5400 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+}
+.main .stButton > button:hover {
+    background-color: #cc4300 !important;
+    border-left: none !important;
+}
+
+/* Separadores */
+hr { border-color: #1a1a1a !important; }
+
+/* Títulos */
+h1 { color: #ffffff !important; font-weight: 700 !important; }
+h2, h3, h4, h5 { color: #f1f5f9 !important; }
+
+/* Dataframe */
+[data-testid="stDataFrame"] { border: 1px solid #1a1a1a; border-radius: 8px; }
