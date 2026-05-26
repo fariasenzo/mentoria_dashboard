@@ -23,6 +23,9 @@ with open("assets/style.css") as f:
 
 @st.cache_resource
 def get_conn():
+    if not DATABASE_URL:
+        st.error("DATABASE_URL não encontrada. Configure nos Secrets do Streamlit Cloud.")
+        return None
     try:
         return psycopg2.connect(DATABASE_URL)
     except Exception as e:
