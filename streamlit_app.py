@@ -35,6 +35,7 @@ def get_conn():
 @st.cache_resource
 def get_leadfy_conn():
     if not LEADFY_URL:
+        st.error("LEADFY_URL não encontrada. Configure nos Secrets do Streamlit Cloud.")
         return None
     try:
         return psycopg2.connect(LEADFY_URL)
