@@ -6,8 +6,15 @@ from views.vendas import show_vendas
 from views.marketing import show_marketing
 
 load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL", "").replace("postgresql+asyncpg://", "postgresql://")
-LEADFY_URL   = os.getenv("LEADFY_URL", "").replace("postgresql+asyncpg://", "postgresql://")
+
+def get_secret(key):
+    try:
+        return st.secrets[key]
+    except Exception:
+        return os.getenv(key, "")
+
+DATABASE_URL = get_secret("DATABASE_URL").replace("postgresql+asyncpg://", "postgresql://")
+LEADFY_URL   = get_secret("LEADFY_URL").replace("postgresql+asyncpg://", "postgresql://")
 
 st.set_page_config(page_title="Dashboard Mentoria", page_icon="📊", layout="wide", initial_sidebar_state="expanded")
 
