@@ -62,6 +62,6 @@ conn         = get_conn()
 leadfy_conn  = get_leadfy_conn()
 
 if st.session_state.pagina == "vendas":
-    show_vendas(conn)
+    show_vendas(conn, leadfy_conn)
 elif st.session_state.pagina == "marketing":
     show_marketing(leadfy_conn)

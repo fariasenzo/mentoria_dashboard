@@ -13,6 +13,34 @@ FUNNEL_COLORS = {
     "VENDA":  "#eab308",
 }
 
+def format_brl(value):
+    try:
+        value = float(value)
+        return f"R$ {value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except (ValueError, TypeError):
+        return "R$ 0,00"
+
+def load_receita_negociacao(conn):
+    if conn is None:
+        return 0.0
+    query = """
+        SELECT COALESCE(SUM(cd.final_price), 0)
+        FROM conversations c
+        JOIN conversation_stages cs ON c.stage_id = cs.id
+        JOIN conversation_deals cd ON c.id = cd.conversation_id
+        WHERE c.instance_id IN %s
+        AND cs.name = 'LINK DE PAGAMENTO ENVIADO'
+    """
+    try:
+        with conn.cursor() as cur:
+            cur.execute(query, (INSTANCE_IDS,))
+            result = cur.fetchone()
+            return float(result[0]) if result and result[0] is not None else 0.0
+    except Exception as e:
+        st.error(f"Erro ao carregar receita em negociação: {e}")
+        conn.rollback()
+        return 0.0
+
 def get_date_range(period):
     today = datetime.now()
     if period == "Hoje":
@@ -175,6 +203,8 @@ def show_marketing(conn):
     sql2     = data2["sql"] if data2 else 0
     ns_rate2 = (no_show2 / sql2 * 100) if sql2 > 0 else 0
 
+    receita_neg = load_receita_negociacao(conn)
+
     c1, c2, c3, _ = st.columns([1, 1, 1, 2])
     with c1:
         st.metric("Calls Agendadas", f"{sql_val:,}".replace(",", "."), delta=delta(sql_val, sql2) if comparing else None)
@@ -197,3 +227,6 @@ def show_marketing(conn):
             sign = "+" if diff >= 0 else ""
             st.markdown(f'<div style="color:#9ca3af;font-size:0.85rem;margin-top:-8px">Comparação: {ns_rate2:.1f}%</div>', unsafe_allow_html=True)
             st.markdown(f'<div style="color:#6b7280;font-size:0.82rem">Diferença: {sign}{diff:.1f}%</div>', unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.metric("Receita em Negociação", format_brl(receita_neg))

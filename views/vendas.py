@@ -182,7 +182,28 @@ def bar_chart(fig_data, title, orientation='v', fig_data2=None):
     fig.update_layout(layout_args)
     return fig
 
-def show_vendas(conn):
+def load_receita_negociacao(conn):
+    if conn is None:
+        return 0.0
+    _INSTANCE_IDS = ('cmokhzvfb02yh02ok4wl08cv6', 'cmoq9t9n000j002mlhhtzgt1c', 'cmpg0aool07j102qopi6yz8u7')
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT COALESCE(SUM(cd.final_price), 0)
+                FROM conversations c
+                JOIN conversation_stages cs ON c.stage_id = cs.id
+                JOIN conversation_deals cd ON c.id = cd.conversation_id
+                WHERE c.instance_id IN %s
+                AND cs.name = 'LINK DE PAGAMENTO ENVIADO'
+            """, (_INSTANCE_IDS,))
+            result = cur.fetchone()
+            return float(result[0]) if result and result[0] is not None else 0.0
+    except Exception as e:
+        st.error(f"Erro ao carregar receita em negociação: {e}")
+        conn.rollback()
+        return 0.0
+
+def show_vendas(conn, leadfy_conn=None):
     st.markdown("""
         <div style="margin-bottom:1.5rem">
             <span style="font-size:2rem;font-weight:800;color:#ffffff;letter-spacing:-0.02em">Vendas</span>
@@ -208,8 +229,9 @@ def show_vendas(conn):
 
     fat1, v1, t1 = kpis(df1)
     fat2, v2, t2 = kpis(df2)
+    receita_neg = load_receita_negociacao(leadfy_conn)
 
-    k1, k2, k3 = st.columns(3)
+    k1, k2, k3, k4 = st.columns(4)
     with k1:
         st.metric("Faturamento Total", format_brl(fat1), delta=delta(fat1, fat2) if comparing else None)
         if comparing:
@@ -231,6 +253,8 @@ def show_vendas(conn):
             sign = "+" if diff >= 0 else ""
             st.markdown(f'<div style="color:#9ca3af;font-size:0.85rem;margin-top:-8px">Comparação: {format_brl(t2)}</div>', unsafe_allow_html=True)
             st.markdown(f'<div style="color:#6b7280;font-size:0.82rem">Diferença: {sign}{format_brl(diff)}</div>', unsafe_allow_html=True)
+    with k4:
+        st.metric("Receita em Negociação", format_brl(receita_neg))
 
     if df1.empty:
         st.warning("Nenhum dado para o período selecionado.")
