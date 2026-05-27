@@ -44,6 +44,8 @@ Usar sempre `mentoria_clean` (não `mentoria` diretamente). As views já tratam:
 - NUMERIC → float
 - `clientes` deduplicados com DISTINCT ON
 
+**Exceção:** `mentoria.automacao_hubla` é lida diretamente (sem view limpa) via UNION ALL em `load_data()` em `vendas.py`, pois é a tabela de captura de webhooks da Hubla.
+
 ### Views disponíveis em `mentoria_clean`
 
 | View | Descrição |
@@ -63,9 +65,18 @@ Usar sempre `mentoria_clean` (não `mentoria` diretamente). As views já tratam:
 
 `valor_produto`, `valor_desconto`, `valor_total`, `taxa_hubla_variavel`, `taxa_hubla_fixa`, `valor_liquido`, `valor_comissao_afiliados`, `valor_comissao_coprodutores`, `valor_sua_comissao` — todos float
 
+### Tabela `mentoria.automacao_hubla`
+
+Captura de webhooks da Hubla. Usada em UNION ALL com `mentoria_clean.faturas` no `load_data()` de `vendas.py` para incluir vendas que entraram pela automação mas ainda não foram sincronizadas nas tabelas principais.
+
+- `total_amount` armazena o **valor líquido** (após taxas Hubla) — a automação foi configurada para gravar o líquido aqui
+- Entradas de teste são filtradas: `transaction_id NOT LIKE '%-tester'` e `user_email NOT LIKE '%@example.com'`
+- Deduplicação: só inclui registros cujo `transaction_id` não existe em `mentoria_clean.faturas`
+- `%` nos LIKE deve ser escapado como `%%` no psycopg2
+
 ## Quirks e Armadilhas Conhecidas
 
-- **Nunca usar o schema `mentoria` diretamente nas queries** — sempre `mentoria_clean`
+- **Nunca usar o schema `mentoria` diretamente nas queries** — sempre `mentoria_clean` (exceto `automacao_hubla`, que não tem view limpa)
 - **psycopg2 retorna `decimal.Decimal`** para colunas NUMERIC — já tratado nas views, mas se precisar em Python: `.astype(float)` no DataFrame
 - **CSS da sidebar:** o botão de toggle usa `data-testid="stExpandSidebarButton"` e fica dentro do `stToolbar`. Não esconder o toolbar inteiro — esconder apenas `stToolbarActions`, `stAppDeployButton`, `stMainMenu`
 - **CSS é carregado em `streamlit_app.py`** (não nas views individuais), para garantir que aplica em todas as páginas desde o início

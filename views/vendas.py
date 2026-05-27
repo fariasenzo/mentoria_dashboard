@@ -76,7 +76,25 @@ def load_data(conn, start, end):
         WHERE f.data_pagamento IS NOT NULL
         AND f.data_pagamento >= %s
         AND f.data_pagamento <= %s
-    """, (start, end))
+
+        UNION ALL
+
+        SELECT
+            ah.transaction_id      AS id_fatura,
+            ah.user_email          AS id_cliente,
+            ah.user_name           AS nome_cliente,
+            ah.total_amount::float AS valor_liquido,
+            ah.paid_at             AS data_pagamento
+        FROM mentoria.automacao_hubla ah
+        WHERE ah.paid_at IS NOT NULL
+        AND ah.paid_at >= %s
+        AND ah.paid_at <= %s
+        AND ah.transaction_id NOT LIKE '%%-tester'
+        AND ah.user_email NOT LIKE '%%@example.com'
+        AND ah.transaction_id NOT IN (
+            SELECT id_fatura FROM mentoria_clean.faturas WHERE data_pagamento IS NOT NULL
+        )
+    """, (start, end, start, end))
 
 def kpis(df):
     if df.empty:
